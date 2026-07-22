@@ -511,6 +511,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebarMobile);
     if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebarMobile);
 
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeSidebarMobile();
+            if (operationModal) operationModal.classList.remove('active');
+        }
+    });
+
     navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const allNavBtns = document.querySelectorAll('.nav-btn');
