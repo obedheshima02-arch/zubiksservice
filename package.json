@@ -2,7 +2,7 @@
   "name": "zubix-service",
   "version": "1.0.0",
   "description": "Plateforme de gestion pour Zubiks Service",
-  "main": "server.js",
+  "main": "api/index.js",
   "scripts": {
     "start": "node server.js"
   },
