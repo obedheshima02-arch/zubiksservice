@@ -448,6 +448,12 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('zubiks_jwt_token');
         saveActiveSession(null);
 
+        if (msg.includes('supprimé')) {
+            // Purge locale complète si le compte a été effacé par l'admin
+            localStorage.removeItem('zubiksStateV2');
+            localStorage.removeItem('zubixStateV2');
+        }
+
         // Vider tous les formulaires et champs d'entrée
         if (loginForm) loginForm.reset();
         if (registerForm) registerForm.reset();
@@ -455,6 +461,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const passwordInput = document.getElementById('password');
         if (emailInput) emailInput.value = '';
         if (passwordInput) passwordInput.value = '';
+
+        // Vider les bannières et listes de notifications de l'espace membre
+        const userStatusBanner = document.getElementById('user-status-banner');
+        if (userStatusBanner) userStatusBanner.textContent = '';
+        const userNotifList = document.getElementById('user-notifications-list');
+        if (userNotifList) userNotifList.innerHTML = '';
 
         dashboardScreen.classList.remove('active');
         loginScreen.classList.add('active');
@@ -640,9 +652,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td>
                             <input type="number" id="pending-parts-${m.id}" min="1" value="1" style="width: 80px; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; text-align: center; font-weight: bold;">
                         </td>
-                        <td>
+                        <td style="display: flex; gap: 6px;">
                             <button class="btn-action btn-success" onclick="window.validateMemberParts('${m.id}')" style="background-color: var(--success); display: flex; align-items: center; gap: 4px;">
-                                ✅ Valider les Parts
+                                ✅ Valider
+                            </button>
+                            <button class="btn-action btn-danger" onclick="window.deleteMember('${m.id}')" style="background-color: var(--danger); display: flex; align-items: center; gap: 4px;" title="Refuser et effacer cette demande">
+                                🗑️ Refuser
                             </button>
                         </td>
                     `;
@@ -760,8 +775,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Refresh currentUser state from state.members & check if account still exists
             const liveUser = state.members.find(m => String(m.id) === String(currentUser.id));
             if (!liveUser) {
-                // Account was deleted by Admin! Expel user immediately
-                performLogout("Votre compte a été supprimé par l'administrateur.");
+                // Account was deleted by Admin! Expel user & purge client state completely
+                performLogout("Votre compte n'existe plus ou a été supprimé par l'administrateur.");
                 return;
             }
             currentUser = liveUser;
