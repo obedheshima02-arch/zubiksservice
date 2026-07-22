@@ -447,8 +447,18 @@ document.addEventListener('DOMContentLoaded', () => {
         currentJwtToken = null;
         localStorage.removeItem('zubiks_jwt_token');
         saveActiveSession(null);
+
+        // Vider tous les formulaires et champs d'entrée
+        if (loginForm) loginForm.reset();
+        if (registerForm) registerForm.reset();
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        if (emailInput) emailInput.value = '';
+        if (passwordInput) passwordInput.value = '';
+
         dashboardScreen.classList.remove('active');
         loginScreen.classList.add('active');
+        showToast('Vous êtes déconnecté.', 'success');
     });
 
     // --- Navigation (Sidebar) ---
