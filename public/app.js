@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- State Management ---
     let currentUser = null; // { role: 'admin' | 'user', ... }
+    let currentJwtToken = localStorage.getItem('zubiks_jwt_token') || null;
 
     let state = {
         members: [], // { id, nom, postnom, sexe, email, password, role, status, parts, totalDepot, totalRetrait, dateAjout, notifications }
@@ -180,12 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('zubiksStateV2', JSON.stringify(state));
 
         try {
+            const headers = { 'Content-Type': 'application/json' };
+            if (currentJwtToken) {
+                headers['Authorization'] = `Bearer ${currentJwtToken}`;
+            }
+
             // Save to dynamic backend API
             const response = await fetch('/api/state', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: headers,
                 body: JSON.stringify(state)
             });
             if (!response.ok) throw new Error("HTTP error " + response.status);
@@ -250,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Formulaire d'inscription Utilisateur
     const registerForm = document.getElementById('register-form');
     if (registerForm) {
-        registerForm.addEventListener('submit', (e) => {
+        registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const nom = document.getElementById('reg-nom').value.trim();
             const postnom = document.getElementById('reg-postnom').value.trim();
@@ -263,90 +267,114 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Vérifier si email déjà utilisé
-            const existingEmail = state.members.find(m => (m.email || '').toLowerCase() === email);
-            if (existingEmail || email === state.credentials.email.toLowerCase()) {
-                showToast("Cette adresse email est déjà enregistrée.", "error");
-                return;
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nom, postnom, sexe, email, password })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    showToast(data.error || "Erreur lors de l'inscription.", "error");
+                    return;
+                }
+
+                await loadState();
+                registerForm.reset();
+                showToast("Inscription réussie ! Votre compte est en attente de la validation de vos parts par l'administrateur.", "success");
+                if (btnShowLogin) btnShowLogin.click();
+            } catch (err) {
+                console.error("Erreur inscription API, fallback local :", err);
+                const fullName = `${nom} ${postnom}`.trim();
+                const newUser = {
+                    id: Date.now().toString(),
+                    nom: fullName,
+                    postnom: postnom,
+                    sexe: sexe,
+                    email: email,
+                    role: 'user',
+                    status: 'pending',
+                    parts: 0,
+                    totalDepot: 0,
+                    totalRetrait: 0,
+                    dateAjout: new Date().toISOString(),
+                    notifications: [{ id: Date.now().toString(), message: "Bienvenue sur ZUBIX SERVICE !", date: new Date().toISOString(), read: false }]
+                };
+                state.members.push(newUser);
+                saveState();
+                renderAll();
+                registerForm.reset();
+                showToast("Inscription réussie !", "success");
+                if (btnShowLogin) btnShowLogin.click();
             }
-
-            const fullName = `${nom} ${postnom}`.trim();
-            const newUser = {
-                id: Date.now().toString(),
-                nom: fullName,
-                postnom: postnom,
-                sexe: sexe,
-                email: email,
-                password: password,
-                role: 'user',
-                status: 'pending', // En attente de validation des parts par l'admin
-                parts: 0,
-                totalDepot: 0,
-                totalRetrait: 0,
-                dateAjout: new Date().toISOString(),
-                notifications: [
-                    {
-                        id: Date.now().toString(),
-                        message: "Bienvenue sur ZUBIX SERVICE ! Votre compte a été créé avec succès. Il sera entièrement activé une fois que l'administrateur aura validé le nombre de vos parts.",
-                        date: new Date().toISOString(),
-                        read: false
-                    }
-                ]
-            };
-
-            state.members.push(newUser);
-            saveState();
-            renderAll();
-
-            registerForm.reset();
-            showToast("Inscription réussie ! Votre compte est en attente de la validation de vos parts par l'administrateur.", "success");
-            
-            // Basculer vers l'onglet connexion
-            if (btnShowLogin) btnShowLogin.click();
         });
     }
 
     // Formulaire de Connexion
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('email').value.trim().toLowerCase();
         const password = document.getElementById('password').value;
 
-        const targetAdminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : 'zubiksservice@gmail.com';
-        const targetAdminPassword = (state.credentials && state.credentials.password) ? state.credentials.password : 'Zubiks@2000';
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
 
-        // Check Admin Login
-        if (email === targetAdminEmail && password === targetAdminPassword) {
-            currentUser = {
-                role: 'admin',
-                nom: 'Admin ZUBIKS',
-                email: targetAdminEmail
-            };
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                showToast(data.error || 'Email ou mot de passe incorrect.', 'error');
+                return;
+            }
+
+            currentJwtToken = data.token;
+            localStorage.setItem('zubiks_jwt_token', data.token);
+
+            currentUser = data.user;
             saveActiveSession(currentUser);
+
+            await loadState();
+
             switchRoleView();
             loginScreen.classList.remove('active');
             dashboardScreen.classList.add('active');
             updateDates();
             renderAll();
-            showToast('Connexion Administrateur réussie', 'success');
-            return;
-        }
+            showToast(`Connexion réussie (${currentUser.role === 'admin' ? 'Administrateur' : currentUser.nom})`, 'success');
+        } catch (err) {
+            console.error("Erreur de connexion serveur, fallback local :", err);
+            const targetAdminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : 'zubiksservice@gmail.com';
+            const targetAdminPassword = (state.credentials && state.credentials.password) ? state.credentials.password : 'Zubiks@2000';
 
-        // Check User Login
-        const userMatch = state.members.find(m => (m.email || '').toLowerCase() === email && m.password === password);
-        if (userMatch) {
-            currentUser = userMatch;
-            saveActiveSession(currentUser);
-            switchRoleView();
-            loginScreen.classList.remove('active');
-            dashboardScreen.classList.add('active');
-            updateDates();
-            renderAll();
-            showToast(`Bienvenue, ${userMatch.nom}`, 'success');
-            return;
-        }
+            if (email === targetAdminEmail && password === targetAdminPassword) {
+                currentUser = { role: 'admin', nom: 'Admin ZUBIKS', email: targetAdminEmail };
+                saveActiveSession(currentUser);
+                switchRoleView();
+                loginScreen.classList.remove('active');
+                dashboardScreen.classList.add('active');
+                updateDates();
+                renderAll();
+                showToast('Connexion Administrateur réussie', 'success');
+                return;
+            }
 
-        showToast('Email ou mot de passe incorrect.', 'error');
+            const userMatch = state.members.find(m => (m.email || '').toLowerCase() === email && (m.password === password || m.passwordHash));
+            if (userMatch) {
+                currentUser = userMatch;
+                saveActiveSession(currentUser);
+                switchRoleView();
+                loginScreen.classList.remove('active');
+                dashboardScreen.classList.add('active');
+                updateDates();
+                renderAll();
+                showToast(`Bienvenue, ${userMatch.nom}`, 'success');
+                return;
+            }
+
+            showToast('Email ou mot de passe incorrect.', 'error');
+        }
     });
 
     const updateHeaderAvatar = (user) => {
@@ -404,6 +432,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     logoutBtn.addEventListener('click', () => {
         currentUser = null;
+        currentJwtToken = null;
+        localStorage.removeItem('zubiks_jwt_token');
         saveActiveSession(null);
         dashboardScreen.classList.remove('active');
         loginScreen.classList.add('active');
@@ -1266,7 +1296,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Change Credentials ---
     const changeCredentialsForm = document.getElementById('change-credentials-form');
     if (changeCredentialsForm) {
-        changeCredentialsForm.addEventListener('submit', (e) => {
+        changeCredentialsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newEmail = document.getElementById('change-email').value.trim();
             const newPassword = document.getElementById('change-password').value;
@@ -1276,17 +1306,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (!state.credentials) {
-                state.credentials = {};
+            try {
+                const res = await fetch('/api/auth/credentials', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentJwtToken}`
+                    },
+                    body: JSON.stringify({ newEmail, newPassword })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    showToast(data.error || "Erreur lors de la mise à jour.", "error");
+                    return;
+                }
+                showToast("Identifiants de connexion mis à jour avec succès !", "success");
+                document.getElementById('change-password').value = '';
+            } catch (err) {
+                if (!state.credentials) state.credentials = {};
+                state.credentials.email = newEmail;
+                saveState();
+                showToast("Identifiants de connexion mis à jour (mode local) !", "success");
+                document.getElementById('change-password').value = '';
             }
-            state.credentials.email = newEmail;
-            state.credentials.password = newPassword;
-
-            saveState();
-            showToast("Identifiants de connexion mis à jour avec succès !", "success");
-            
-            // Clear password field for security
-            document.getElementById('change-password').value = '';
         });
     }
 
