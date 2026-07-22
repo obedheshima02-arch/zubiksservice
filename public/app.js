@@ -322,6 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 nom: 'Admin ZUBIKS',
                 email: targetAdminEmail
             };
+            saveActiveSession(currentUser);
             switchRoleView();
             loginScreen.classList.remove('active');
             dashboardScreen.classList.add('active');
@@ -335,6 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const userMatch = state.members.find(m => (m.email || '').toLowerCase() === email && m.password === password);
         if (userMatch) {
             currentUser = userMatch;
+            saveActiveSession(currentUser);
             switchRoleView();
             loginScreen.classList.remove('active');
             dashboardScreen.classList.add('active');
@@ -402,6 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     logoutBtn.addEventListener('click', () => {
         currentUser = null;
+        saveActiveSession(null);
         dashboardScreen.classList.remove('active');
         loginScreen.classList.add('active');
     });
@@ -1310,7 +1313,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Persistent Session Management ---
+    const SESSION_KEY = 'zubiks_active_session_v1';
+
+    const saveActiveSession = (user) => {
+        if (!user) {
+            localStorage.removeItem(SESSION_KEY);
+        } else {
+            localStorage.setItem(SESSION_KEY, JSON.stringify({
+                role: user.role,
+                id: user.id || null,
+                email: user.email || null
+            }));
+        }
+    };
+
+    const checkAndRestoreSession = () => {
+        const savedSession = localStorage.getItem(SESSION_KEY);
+        if (savedSession) {
+            try {
+                const sess = JSON.parse(savedSession);
+                if (sess.role === 'admin') {
+                    currentUser = {
+                        role: 'admin',
+                        nom: 'Admin ZUBIKS',
+                        email: (state.credentials && state.credentials.email) ? state.credentials.email : 'zubiksservice@gmail.com'
+                    };
+                } else if (sess.id || sess.email) {
+                    const userMatch = state.members.find(m => String(m.id) === String(sess.id) || (m.email && m.email.toLowerCase() === (sess.email || '').toLowerCase()));
+                    if (userMatch) {
+                        currentUser = userMatch;
+                    }
+                }
+
+                if (currentUser) {
+                    switchRoleView();
+                    if (loginScreen) loginScreen.classList.remove('active');
+                    if (dashboardScreen) dashboardScreen.classList.add('active');
+                    updateDates();
+                    renderAll();
+                    console.log("Session restaurée automatiquement.");
+                }
+            } catch (e) {
+                console.error("Erreur lors de la restauration de la session :", e);
+                localStorage.removeItem(SESSION_KEY);
+            }
+        }
+    };
+
     // Initialize
-    loadState();
-    // Only render if we are on dashboard (e.g. bypassing login for dev if we wanted, but we don't here)
+    loadState().then(() => {
+        checkAndRestoreSession();
+    }).catch(() => {
+        checkAndRestoreSession();
+    });
 });
