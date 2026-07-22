@@ -442,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    logoutBtn.addEventListener('click', () => {
+    const performLogout = (msg = 'Vous êtes déconnecté.') => {
         currentUser = null;
         currentJwtToken = null;
         localStorage.removeItem('zubiks_jwt_token');
@@ -458,8 +458,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         dashboardScreen.classList.remove('active');
         loginScreen.classList.add('active');
-        showToast('Vous êtes déconnecté.', 'success');
-    });
+        showToast(msg, msg.includes('supprimé') ? 'error' : 'success');
+    };
+
+    if (logoutBtn) logoutBtn.addEventListener('click', () => performLogout());
+    const headerLogoutBtn = document.getElementById('header-logout-btn');
+    if (headerLogoutBtn) headerLogoutBtn.addEventListener('click', () => performLogout());
 
     // --- Navigation (Sidebar) ---
     const tabTitles = {
@@ -753,8 +757,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Render User Specific Space (if logged in as regular user) ---
         if (currentUser && currentUser.role !== 'admin') {
-            // Refresh currentUser state from state.members
-            const liveUser = state.members.find(m => String(m.id) === String(currentUser.id)) || currentUser;
+            // Refresh currentUser state from state.members & check if account still exists
+            const liveUser = state.members.find(m => String(m.id) === String(currentUser.id));
+            if (!liveUser) {
+                // Account was deleted by Admin! Expel user immediately
+                performLogout("Votre compte a été supprimé par l'administrateur.");
+                return;
+            }
             currentUser = liveUser;
 
             const userWelcomeName = document.getElementById('user-welcome-name');
@@ -1407,6 +1416,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const userMatch = state.members.find(m => String(m.id) === String(sess.id) || (m.email && m.email.toLowerCase() === (sess.email || '').toLowerCase()));
                     if (userMatch) {
                         currentUser = userMatch;
+                    } else {
+                        // Deleted member fallback: revoke session
+                        saveActiveSession(null);
+                        localStorage.removeItem('zubiks_jwt_token');
+                        currentUser = null;
                     }
                 }
 
