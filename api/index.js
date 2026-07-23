@@ -56,7 +56,12 @@ function loadStateFromDisk() {
 
       if (!parsed.messages) parsed.messages = [];
       if (!parsed.deletedMembers) parsed.deletedMembers = [];
-      
+
+      // Clean admin emails from deletedMembers if mistakenly added
+      const adminEmail = (parsed.credentials && parsed.credentials.email) ? parsed.credentials.email.toLowerCase() : "zubiksservice@gmail.com";
+      const protectedAdminEmails = ["zubiksservice@gmail.com", "obedtechn02@gmail.com", adminEmail];
+      parsed.deletedMembers = parsed.deletedMembers.filter(dm => dm && dm.email && !protectedAdminEmails.includes(dm.email.toLowerCase()));
+
       memoryState = parsed;
       return memoryState;
     } catch (err) {
@@ -123,27 +128,29 @@ app.post('/api/auth/login', (req, res) => {
 
   const state = loadStateFromDisk();
   const lowerEmail = email.trim().toLowerCase();
+  const cleanPassword = (password || '').trim();
 
-  // Check if member is in deletedMembers registry
-  const isDeleted = (state.deletedMembers || []).some(dm => dm.email && dm.email.toLowerCase() === lowerEmail);
+  // Check Admin credentials first
+  const adminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : "zubiksservice@gmail.com";
+  const validAdminEmails = ["zubiksservice@gmail.com", "obedtechn02@gmail.com", adminEmail];
+
+  // Check if member is in deletedMembers registry (never block admin emails)
+  const isDeleted = !validAdminEmails.includes(lowerEmail) && (state.deletedMembers || []).some(dm => dm.email && dm.email.toLowerCase() === lowerEmail);
   if (isDeleted) {
     return res.status(403).json({ error: "Votre compte a été supprimé par l'administrateur.", isDeleted: true });
   }
 
-  // Check Admin credentials
-  const adminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : "zubiksservice@gmail.com";
-  const validAdminEmails = ["zubiksservice@gmail.com", "obedtechn02@gmail.com", adminEmail];
   let isAdminMatch = false;
 
   if (validAdminEmails.includes(lowerEmail)) {
     if (state.credentials && state.credentials.passwordHash) {
-      isAdminMatch = bcrypt.compareSync(password, state.credentials.passwordHash);
+      isAdminMatch = bcrypt.compareSync(password, state.credentials.passwordHash) || bcrypt.compareSync(cleanPassword, state.credentials.passwordHash);
     }
     if (!isAdminMatch && state.credentials && state.credentials.password) {
-      isAdminMatch = (password === state.credentials.password);
+      isAdminMatch = (password === state.credentials.password || cleanPassword === state.credentials.password);
     }
     if (!isAdminMatch) {
-      isAdminMatch = (password === "Zubiks@2000");
+      isAdminMatch = (password === "Zubiks@2000" || cleanPassword === "Zubiks@2000" || cleanPassword.toLowerCase() === "zubiks@2000");
     }
 
     if (isAdminMatch) {

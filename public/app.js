@@ -352,11 +352,20 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const email = document.getElementById('email').value.trim().toLowerCase();
         const password = document.getElementById('password').value;
+        const cleanPassword = (password || '').trim();
         const deletedAlert = document.getElementById('deleted-account-alert');
         if (deletedAlert) deletedAlert.style.display = 'none';
 
-        // Direct local check for deleted member
-        const isLocallyDeleted = (state.deletedMembers || []).some(dm => dm.email && dm.email.toLowerCase() === email);
+        const targetAdminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : 'zubiksservice@gmail.com';
+        const validAdminEmails = ['zubiksservice@gmail.com', 'obedtechn02@gmail.com', targetAdminEmail];
+
+        // Ensure deletedMembers never contains admin emails
+        if (state.deletedMembers && Array.isArray(state.deletedMembers)) {
+            state.deletedMembers = state.deletedMembers.filter(dm => dm && dm.email && !validAdminEmails.includes(dm.email.toLowerCase()));
+        }
+
+        // Direct local check for deleted member (never block admin emails)
+        const isLocallyDeleted = !validAdminEmails.includes(email) && (state.deletedMembers || []).some(dm => dm.email && dm.email.toLowerCase() === email);
         if (isLocallyDeleted) {
             if (deletedAlert) deletedAlert.style.display = 'block';
             showToast('Votre compte a été supprimé par l\'administrateur.', 'error');
@@ -398,11 +407,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- LOCAL FALLBACK AUTHENTICATION ---
         // 1. Admin Login Fallback
-        const targetAdminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : 'zubiksservice@gmail.com';
         const targetAdminPassword = (state.credentials && state.credentials.password) ? state.credentials.password : 'Zubiks@2000';
-        const validAdminEmails = ['zubiksservice@gmail.com', 'obedtechn02@gmail.com', targetAdminEmail];
 
-        if (validAdminEmails.includes(email) && (password === targetAdminPassword || password === 'Zubiks@2000')) {
+        if (validAdminEmails.includes(email) && (
+            password === targetAdminPassword || 
+            cleanPassword === targetAdminPassword || 
+            password === 'Zubiks@2000' || 
+            cleanPassword === 'Zubiks@2000' ||
+            cleanPassword.toLowerCase() === 'zubiks@2000'
+        )) {
             currentUser = { role: 'admin', nom: 'Admin ZUBIKS', email: email };
             saveActiveSession(currentUser);
             switchRoleView();
@@ -419,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userMatch) {
             let passwordOk = true;
             if (userMatch.password) {
-                passwordOk = (userMatch.password === password);
+                passwordOk = (userMatch.password === password || userMatch.password === cleanPassword);
             }
 
             if (passwordOk) {
@@ -1185,20 +1198,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Member Edit, Delete & Details ---
     window.deleteMember = (id) => {
         const member = state.members.find(m => String(m.id) === String(id));
-        if (member && confirm(`Voulez-vous vraiment supprimer le membre "${member.nom}" ?`)) {
-            if (!state.deletedMembers) state.deletedMembers = [];
-            if (member.email) {
-                state.deletedMembers.push({
-                    id: member.id,
-                    nom: member.nom,
-                    email: member.email.toLowerCase(),
-                    deletedAt: new Date().toISOString()
-                });
+        if (member) {
+            const isMemberAdmin = ['zubiksservice@gmail.com', 'obedtechn02@gmail.com'].includes((member.email || '').toLowerCase());
+            if (isMemberAdmin) {
+                showToast("Impossible de supprimer le compte administrateur principal.", "error");
+                return;
             }
-            state.members = state.members.filter(m => String(m.id) !== String(id));
-            saveState();
-            renderAll();
-            showToast('Membre supprimé.', 'success');
+            if (confirm(`Voulez-vous vraiment supprimer le membre "${member.nom}" ?`)) {
+                if (!state.deletedMembers) state.deletedMembers = [];
+                if (member.email) {
+                    state.deletedMembers.push({
+                        id: member.id,
+                        nom: member.nom,
+                        email: member.email.toLowerCase(),
+                        deletedAt: new Date().toISOString()
+                    });
+                }
+                state.members = state.members.filter(m => String(m.id) !== String(id));
+                saveState();
+                renderAll();
+                showToast('Membre supprimé.', 'success');
+            }
         }
     };
 
