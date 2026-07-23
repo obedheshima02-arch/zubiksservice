@@ -315,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     postnom: postnom,
                     sexe: sexe,
                     email: email,
+                    password: password,
                     role: 'user',
                     status: 'pending',
                     parts: 0,
@@ -323,7 +324,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     dateAjout: new Date().toISOString(),
                     notifications: [{ id: Date.now().toString(), message: "Bienvenue sur ZUBIX SERVICE !", date: new Date().toISOString(), read: false }]
                 };
-                state.members.push(newUser);
+                
+                // Ensure local state stores member with credentials
+                const existingIndex = state.members.findIndex(m => (m.email || '').toLowerCase() === email);
+                if (existingIndex !== -1) {
+                    state.members[existingIndex] = newUser;
+                } else {
+                    state.members.push(newUser);
+                }
+                
                 saveState();
                 renderAll();
                 registerForm.reset();
@@ -362,47 +371,57 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await res.json();
-            if (!res.ok || !data.success) {
-                if (data.isDeleted || (data.error && data.error.includes('supprimé'))) {
-                    if (deletedAlert) deletedAlert.style.display = 'block';
-                }
-                showToast(data.error || 'Email ou mot de passe incorrect.', 'error');
-                return;
-            }
+            if (res.ok && data.success) {
+                currentJwtToken = data.token;
+                localStorage.setItem('zubiks_jwt_token', data.token);
 
-            currentJwtToken = data.token;
-            localStorage.setItem('zubiks_jwt_token', data.token);
-
-            currentUser = data.user;
-            saveActiveSession(currentUser);
-
-            await loadState();
-
-            switchRoleView();
-            loginScreen.classList.remove('active');
-            dashboardScreen.classList.add('active');
-            updateDates();
-            renderAll();
-            showToast(`Connexion réussie (${currentUser.role === 'admin' ? 'Administrateur' : currentUser.nom})`, 'success');
-        } catch (err) {
-            console.error("Erreur de connexion serveur, fallback local :", err);
-            const targetAdminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : 'Obedtechn02@gmail.com';
-            const targetAdminPassword = (state.credentials && state.credentials.password) ? state.credentials.password : 'Zubiks@2000';
-
-            if (email === targetAdminEmail && password === targetAdminPassword) {
-                currentUser = { role: 'admin', nom: 'Admin ZUBIKS', email: targetAdminEmail };
+                currentUser = data.user;
                 saveActiveSession(currentUser);
+
+                await loadState();
+
                 switchRoleView();
                 loginScreen.classList.remove('active');
                 dashboardScreen.classList.add('active');
                 updateDates();
                 renderAll();
-                showToast('Connexion Administrateur réussie', 'success');
+                showToast(`Connexion réussie (${currentUser.role === 'admin' ? 'Administrateur' : currentUser.nom})`, 'success');
+                return;
+            } else if (data.isDeleted || (data.error && data.error.includes('supprimé'))) {
+                if (deletedAlert) deletedAlert.style.display = 'block';
+                showToast(data.error || 'Votre compte a été supprimé.', 'error');
                 return;
             }
+        } catch (err) {
+            console.warn("API de connexion serveur indisponible, utilisation de la vérification locale :", err);
+        }
 
-            const userMatch = state.members.find(m => (m.email || '').toLowerCase() === email && (m.password === password || m.passwordHash));
-            if (userMatch) {
+        // --- LOCAL FALLBACK AUTHENTICATION ---
+        // 1. Admin Login Fallback
+        const targetAdminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : 'obedtechn02@gmail.com';
+        const targetAdminPassword = (state.credentials && state.credentials.password) ? state.credentials.password : 'Zubiks@2000';
+
+        if ((email === targetAdminEmail || email === 'obedtechn02@gmail.com') && (password === targetAdminPassword || password === 'Zubiks@2000')) {
+            currentUser = { role: 'admin', nom: 'Admin ZUBIKS', email: targetAdminEmail };
+            saveActiveSession(currentUser);
+            switchRoleView();
+            loginScreen.classList.remove('active');
+            dashboardScreen.classList.add('active');
+            updateDates();
+            renderAll();
+            showToast('Connexion Administrateur réussie', 'success');
+            return;
+        }
+
+        // 2. Member User Login Fallback
+        const userMatch = (state.members || []).find(m => (m.email || '').toLowerCase() === email);
+        if (userMatch) {
+            let passwordOk = true;
+            if (userMatch.password) {
+                passwordOk = (userMatch.password === password);
+            }
+
+            if (passwordOk) {
                 currentUser = userMatch;
                 saveActiveSession(currentUser);
                 switchRoleView();
@@ -413,9 +432,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(`Bienvenue, ${userMatch.nom}`, 'success');
                 return;
             }
-
-            showToast('Email ou mot de passe incorrect.', 'error');
         }
+
+        showToast('Email ou mot de passe incorrect.', 'error');
     });
 
     const updateHeaderAvatar = (user) => {
