@@ -30,6 +30,8 @@ const DEFAULT_STATE = {
   archives: [],
   dailyArchives: [],
   transactions: [],
+  messages: [],
+  deletedMembers: [],
   credentials: {
     email: "Obedtechn02@gmail.com",
     passwordHash: bcrypt.hashSync("Zubiks@2000", 10)
@@ -51,6 +53,9 @@ function loadStateFromDisk() {
         parsed.credentials.passwordHash = bcrypt.hashSync(parsed.credentials.password, 10);
         delete parsed.credentials.password;
       }
+
+      if (!parsed.messages) parsed.messages = [];
+      if (!parsed.deletedMembers) parsed.deletedMembers = [];
       
       memoryState = parsed;
       return memoryState;
@@ -118,6 +123,12 @@ app.post('/api/auth/login', (req, res) => {
 
   const state = loadStateFromDisk();
   const lowerEmail = email.trim().toLowerCase();
+
+  // Check if member is in deletedMembers registry
+  const isDeleted = (state.deletedMembers || []).some(dm => dm.email && dm.email.toLowerCase() === lowerEmail);
+  if (isDeleted) {
+    return res.status(403).json({ error: "Votre compte a été supprimé par l'administrateur.", isDeleted: true });
+  }
 
   // Check Admin credentials
   const adminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : "Obedtechn02@gmail.com";

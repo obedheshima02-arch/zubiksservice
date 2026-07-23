@@ -1294,3 +1294,69 @@ button {
         white-space: nowrap;
     }
 }
+
+/* --- Chat & Messagerie Styling --- */
+.chat-bubble {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    position: relative;
+    word-break: break-word;
+}
+
+.chat-bubble.admin {
+    align-self: flex-start;
+    background: #edf2f7;
+    color: var(--text-dark);
+    border-bottom-left-radius: 2px;
+}
+
+.chat-bubble.user {
+    align-self: flex-end;
+    background: var(--primary-color);
+    color: white;
+    border-bottom-right-radius: 2px;
+}
+
+.chat-bubble .chat-sender {
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 3px;
+    display: block;
+    opacity: 0.9;
+}
+
+.chat-bubble .chat-time {
+    font-size: 0.68rem;
+    display: block;
+    text-align: right;
+    margin-top: 4px;
+    opacity: 0.75;
+}
+
+.chat-member-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #edf2f7;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-member-item:hover {
+    background: #edf2f7;
+}
+
+.chat-member-item.active {
+    background: #ebf8ff;
+    border-left: 4px solid var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .chat-responsive-layout {
+        grid-template-columns: 1fr !important;
+    }
+}

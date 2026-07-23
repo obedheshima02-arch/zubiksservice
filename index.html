@@ -46,6 +46,10 @@
                 <div id="login-form-wrapper">
                     <h2>Connexion</h2>
                     <p class="subtitle">Entrez vos identifiants pour accéder à votre espace.</p>
+                    <div id="deleted-account-alert" style="display: none; background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 12px 14px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 16px; font-weight: 500;">
+                        🚫 <strong>Votre compte a été supprimé.</strong><br>
+                        <span style="font-size: 0.82rem; color: #742a2a;">Ce compte n'est plus actif sur la plateforme. Veuillez contacter l'administrateur pour plus d'informations.</span>
+                    </div>
                     <form id="login-form">
                         <div class="input-group">
                             <label for="email">Adresse Email</label>
@@ -133,6 +137,10 @@
                     <button class="nav-btn" data-target="tab-transactions">
                         <span class="icon">📜</span> Transactions Globales
                     </button>
+                    <button class="nav-btn" data-target="tab-admin-chat">
+                        <span class="icon">💬</span> Messagerie Admin <span id="admin-unread-chat-badge" class="badge"
+                            style="background: var(--danger); color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.75rem; display: none;">0</span>
+                    </button>
                     <button class="nav-btn" data-target="tab-rapport">
                         <span class="icon">📊</span> Rapports Financiers
                     </button>
@@ -148,6 +156,10 @@
                     </button>
                     <button class="nav-btn" data-target="tab-user-transactions">
                         <span class="icon">📜</span> Mes Transactions
+                    </button>
+                    <button class="nav-btn" data-target="tab-user-chat">
+                        <span class="icon">💬</span> Messagerie & Support <span id="user-unread-chat-badge" class="badge"
+                            style="background: var(--danger); color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.75rem; display: none;">0</span>
                     </button>
                     <button class="nav-btn" data-target="tab-user-notifications">
                         <span class="icon">🔔</span> Notifications <span id="unread-notif-badge" class="badge"
@@ -196,6 +208,13 @@
                             <div class="stat-info">
                                 <h3>Total Membres</h3>
                                 <p class="stat-value" id="accueil-total-membres">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-inner">
+                            <div class="stat-icon">💎</div>
+                            <div class="stat-info">
+                                <h3>Total des Parts</h3>
+                                <p class="stat-value text-primary" id="accueil-total-parts">0</p>
                             </div>
                         </div>
                         <div class="stat-card glass-inner">
@@ -254,12 +273,52 @@
                         </div>
                     </div>
 
-                    <div class="panel glass-panel" style="background: #ebf8ff; border: 1px solid #bee3f8;">
+                    <div class="panel glass-panel" style="background: #ebf8ff; border: 1px solid #bee3f8; margin-bottom: 20px;">
                         <h4 style="color: #2b6cb0; margin-bottom: 8px;">💵 Mode de paiement unique : Cash (Liquidité)
                         </h4>
                         <p class="text-muted" style="font-size: 0.95rem; margin: 0;">Tous vos versements et retraits
                             sont traités directement auprès de l'administrateur en liquidités (cash). Vous recevrez une
                             notification dans votre application à chaque enregistrement.</p>
+                    </div>
+
+                    <!-- Cycle Breakdown Panel (Requirement 2) -->
+                    <div class="panel glass-panel mb-20" style="border-left: 4px solid var(--primary-color); background: #f8fafc;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 15px;">
+                            <h3 style="margin: 0; color: var(--primary-dark); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                                <span>🗓️</span> Décompte Officiel du Cycle (63 Jours / 9 Semaines)
+                            </h3>
+                            <span class="badge" style="background: var(--primary-color); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">Reglement R.O.I</span>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                            <div class="glass-inner" style="padding: 14px; border-radius: 8px; border: 1px solid #cbd5e0; background: white;">
+                                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Jour 1 - Administrateur</span>
+                                <p style="font-size: 1.2rem; font-weight: 700; color: #d69e2e; margin: 5px 0 2px 0;"><span id="user-cycle-day1-val">0</span> Fc</p>
+                                <small class="text-muted" style="font-size: 0.75rem;">Frais service (<span id="user-cycle-parts-calc1">0</span> part × 1 000 Fc)</small>
+                            </div>
+
+                            <div class="glass-inner" style="padding: 14px; border-radius: 8px; border: 1px solid #b2f5ea; background: #e6fffa;">
+                                <span style="font-size: 0.8rem; color: #234e52; font-weight: 600; text-transform: uppercase;">62 Jours Restants - Client</span>
+                                <p style="font-size: 1.2rem; font-weight: 700; color: var(--success); margin: 5px 0 2px 0;"><span id="user-cycle-62days-val">0</span> Fc</p>
+                                <small class="text-muted" style="font-size: 0.75rem;">Part membre (<span id="user-cycle-parts-calc2">0</span> part × 62 × 1 000 Fc)</small>
+                            </div>
+
+                            <div class="glass-inner" style="padding: 14px; border-radius: 8px; border: 1px solid #bee3f8; background: #ebf8ff;">
+                                <span style="font-size: 0.8rem; color: #2b6cb0; font-weight: 600; text-transform: uppercase;">Total Général (63 Jours)</span>
+                                <p style="font-size: 1.2rem; font-weight: 700; color: #2b6cb0; margin: 5px 0 2px 0;"><span id="user-cycle-total-val">0</span> Fc</p>
+                                <small class="text-muted" style="font-size: 0.75rem;">Cotisation totale attendue</small>
+                            </div>
+                        </div>
+
+                        <div style="background: white; padding: 12px 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">
+                                <span>Progression du dépôt Client (Objectif 62 Jours)</span>
+                                <span id="user-cycle-progress-percent">0%</span>
+                            </div>
+                            <div style="width: 100%; height: 10px; background: #edf2f7; border-radius: 5px; overflow: hidden;">
+                                <div id="user-cycle-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #38a169, #48bb78); border-radius: 5px; transition: width 0.4s ease;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -299,6 +358,79 @@
                         </div>
                         <div id="user-notifications-list" style="display: flex; flex-direction: column; gap: 12px;">
                             <!-- Injected -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Messagerie Admin (Requirement 3) -->
+                <div id="tab-admin-chat" class="tab-pane fade-in">
+                    <div class="panel glass-panel" style="padding: 0; overflow: hidden;">
+                        <div style="display: grid; grid-template-columns: 280px 1fr; min-height: 520px;" class="chat-responsive-layout">
+                            <!-- Sidebar Membres -->
+                            <div style="border-right: 1px solid #e2e8f0; background: #f8fafc; display: flex; flex-direction: column;">
+                                <div style="padding: 16px; border-bottom: 1px solid #e2e8f0; background: white;">
+                                    <h4 style="margin: 0 0 10px 0; color: var(--primary-dark);">💬 Discussions Membres</h4>
+                                    <input type="text" id="admin-chat-search" class="large-input" placeholder="Rechercher un membre..." style="width: 100%; padding: 8px 12px; font-size: 0.85rem;">
+                                </div>
+                                <div id="admin-chat-members-list" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+                                    <!-- Injected via app.js -->
+                                </div>
+                            </div>
+
+                            <!-- Thread de Discussion -->
+                            <div style="display: flex; flex-direction: column; background: white;">
+                                <div id="admin-chat-header" style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div id="admin-chat-avatar" class="avatar" style="background: var(--primary-color);">?</div>
+                                        <div>
+                                            <h4 id="admin-chat-target-name" style="margin: 0; font-size: 1rem; color: var(--text-dark);">Sélectionnez un membre</h4>
+                                            <span id="admin-chat-target-info" style="font-size: 0.75rem; color: var(--text-muted);">Cliquez sur un membre à gauche pour démarrer la discussion</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="admin-chat-box" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; min-height: 340px; max-height: 400px; background: #fdfdfd;">
+                                    <div class="text-center text-muted" style="margin: auto; font-size: 0.9rem;">
+                                        💬 Veuillez sélectionner un membre dans la liste pour voir l'historique des conversations.
+                                    </div>
+                                </div>
+
+                                <div style="padding: 12px 16px; border-top: 1px solid #e2e8f0; background: white; display: flex; gap: 10px; align-items: center;">
+                                    <input type="text" id="admin-chat-input" class="large-input" placeholder="Écrivez votre message à ce membre..." style="flex: 1; padding: 10px 14px;" disabled>
+                                    <button id="admin-chat-send-btn" class="btn-primary" style="padding: 10px 18px; border-radius: var(--radius-sm);" disabled>Envoyer 📤</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Messagerie User (Requirement 3) -->
+                <div id="tab-user-chat" class="tab-pane fade-in">
+                    <div class="panel glass-panel" style="padding: 0; overflow: hidden; max-width: 900px; margin: 0 auto;">
+                        <div style="display: flex; flex-direction: column; min-height: 520px; background: white;">
+                            <!-- Header Chat User -->
+                            <div style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div class="avatar" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white;">AZ</div>
+                                    <div>
+                                        <h4 style="margin: 0; font-size: 1.05rem; color: white;">Administrateur ZUBIKS ZD</h4>
+                                        <span style="font-size: 0.75rem; color: rgba(255,255,255,0.85); display: flex; align-items: center; gap: 4px;">
+                                            <span style="width: 8px; height: 8px; background: #48bb78; border-radius: 50%; display: inline-block;"></span> Support Officiel & Assistance Client
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stream des messages -->
+                            <div id="user-chat-box" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; min-height: 340px; max-height: 400px; background: #fdfdfd;">
+                                <!-- Messages injected via app.js -->
+                            </div>
+
+                            <!-- Input bar User -->
+                            <div style="padding: 12px 16px; border-top: 1px solid #e2e8f0; background: #f8fafc; display: flex; gap: 10px; align-items: center;">
+                                <input type="text" id="user-chat-input" class="large-input" placeholder="Posez une question ou signalez un problème à l'administrateur..." style="flex: 1; padding: 10px 14px;">
+                                <button id="user-chat-send-btn" class="btn-primary" style="padding: 10px 18px; border-radius: var(--radius-sm);">Envoyer 📤</button>
+                            </div>
                         </div>
                     </div>
                 </div>
