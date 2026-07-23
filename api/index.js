@@ -33,7 +33,7 @@ const DEFAULT_STATE = {
   messages: [],
   deletedMembers: [],
   credentials: {
-    email: "Obedtechn02@gmail.com",
+    email: "zubiksservice@gmail.com",
     passwordHash: bcrypt.hashSync("Zubiks@2000", 10)
   }
 };
@@ -131,10 +131,11 @@ app.post('/api/auth/login', (req, res) => {
   }
 
   // Check Admin credentials
-  const adminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : "obedtechn02@gmail.com";
+  const adminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : "zubiksservice@gmail.com";
+  const validAdminEmails = ["zubiksservice@gmail.com", "obedtechn02@gmail.com", adminEmail];
   let isAdminMatch = false;
 
-  if (lowerEmail === adminEmail || lowerEmail === "obedtechn02@gmail.com") {
+  if (validAdminEmails.includes(lowerEmail)) {
     if (state.credentials && state.credentials.passwordHash) {
       isAdminMatch = bcrypt.compareSync(password, state.credentials.passwordHash);
     }
@@ -149,7 +150,7 @@ app.post('/api/auth/login', (req, res) => {
       const userPayload = {
         role: 'admin',
         nom: 'Admin ZUBIKS',
-        email: adminEmail
+        email: lowerEmail
       };
       const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '7d' });
       return res.json({ success: true, token, user: userPayload });
@@ -203,9 +204,10 @@ app.post('/api/auth/register', (req, res) => {
   const lowerEmail = email.trim().toLowerCase();
 
   const existing = state.members.find(m => (m.email || '').toLowerCase() === lowerEmail);
-  const adminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : "Obedtechn02@gmail.com";
+  const adminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : "zubiksservice@gmail.com";
+  const validAdminEmails = ["zubiksservice@gmail.com", "obedtechn02@gmail.com", adminEmail];
 
-  if (existing || lowerEmail === adminEmail) {
+  if (existing || validAdminEmails.includes(lowerEmail)) {
     return res.status(400).json({ error: "Cette adresse email est déjà enregistrée." });
   }
 

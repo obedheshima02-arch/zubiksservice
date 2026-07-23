@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messages: [], // System Chat messages
         deletedMembers: [], // Registry of deleted members
         credentials: {
-            email: 'Obedtechn02@gmail.com',
+            email: 'zubiksservice@gmail.com',
             password: 'Zubiks@2000'
         }
     };
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     state.deletedMembers = parsed.deletedMembers || [];
                     state.argentDebut = parsed.argentDebut !== undefined ? parsed.argentDebut : 0;
                     state.credentials = parsed.credentials || {
-                        email: 'Obedtechn02@gmail.com',
+                        email: 'zubiksservice@gmail.com',
                         password: 'Zubiks@2000'
                     };
 
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             state.deletedMembers = parsed.deletedMembers || [];
             state.argentDebut = parsed.argentDebut !== undefined ? parsed.argentDebut : 0;
             state.credentials = parsed.credentials || {
-                email: 'Obedtechn02@gmail.com',
+                email: 'zubiksservice@gmail.com',
                 password: 'Zubiks@2000'
             };
 
@@ -398,11 +398,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- LOCAL FALLBACK AUTHENTICATION ---
         // 1. Admin Login Fallback
-        const targetAdminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : 'obedtechn02@gmail.com';
+        const targetAdminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : 'zubiksservice@gmail.com';
         const targetAdminPassword = (state.credentials && state.credentials.password) ? state.credentials.password : 'Zubiks@2000';
+        const validAdminEmails = ['zubiksservice@gmail.com', 'obedtechn02@gmail.com', targetAdminEmail];
 
-        if ((email === targetAdminEmail || email === 'obedtechn02@gmail.com') && (password === targetAdminPassword || password === 'Zubiks@2000')) {
-            currentUser = { role: 'admin', nom: 'Admin ZUBIKS', email: targetAdminEmail };
+        if (validAdminEmails.includes(email) && (password === targetAdminPassword || password === 'Zubiks@2000')) {
+            currentUser = { role: 'admin', nom: 'Admin ZUBIKS', email: email };
             saveActiveSession(currentUser);
             switchRoleView();
             loginScreen.classList.remove('active');
@@ -1553,7 +1554,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentUser = {
                         role: 'admin',
                         nom: 'Admin ZUBIKS',
-                        email: (state.credentials && state.credentials.email) ? state.credentials.email : 'Obedtechn02@gmail.com'
+                        email: (state.credentials && state.credentials.email) ? state.credentials.email : 'zubiksservice@gmail.com'
                     };
                 } else if (sess.id || sess.email) {
                     const userMatch = state.members.find(m => String(m.id) === String(sess.id) || (m.email && m.email.toLowerCase() === (sess.email || '').toLowerCase()));
