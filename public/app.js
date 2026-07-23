@@ -293,8 +293,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 await loadState();
                 registerForm.reset();
-                showToast("Inscription réussie ! Votre compte est en attente de la validation de vos parts par l'administrateur.", "success");
+                showToast("Création de compte réussie avec succès ! Votre compte est en attente de la validation de vos parts par l'administrateur.", "success");
                 if (btnShowLogin) btnShowLogin.click();
+                
+                const loginEmailInput = document.getElementById('email');
+                const loginPasswordInput = document.getElementById('password');
+                if (loginEmailInput) loginEmailInput.value = email;
+                if (loginPasswordInput) setTimeout(() => loginPasswordInput.focus(), 150);
             } catch (err) {
                 console.error("Erreur inscription API, fallback local :", err);
                 const fullName = `${nom} ${postnom}`.trim();
@@ -316,8 +321,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveState();
                 renderAll();
                 registerForm.reset();
-                showToast("Inscription réussie !", "success");
+                showToast("Création de compte réussie avec succès !", "success");
                 if (btnShowLogin) btnShowLogin.click();
+                
+                const loginEmailInput = document.getElementById('email');
+                const loginPasswordInput = document.getElementById('password');
+                if (loginEmailInput) loginEmailInput.value = email;
+                if (loginPasswordInput) setTimeout(() => loginPasswordInput.focus(), 150);
             }
         });
     }
@@ -462,11 +472,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (emailInput) emailInput.value = '';
         if (passwordInput) passwordInput.value = '';
 
-        // Vider les bannières et listes de notifications de l'espace membre
-        const userStatusBanner = document.getElementById('user-status-banner');
-        if (userStatusBanner) userStatusBanner.textContent = '';
-        const userNotifList = document.getElementById('user-notifications-list');
-        if (userNotifList) userNotifList.innerHTML = '';
+        // Fermer explicitement tous les modals et overlays pour éliminer le flou noir
+        if (operationModal) operationModal.classList.remove('active');
+        if (editMemberModal) editMemberModal.classList.remove('active');
+        if (memberDetailsModal) memberDetailsModal.classList.remove('active');
+        closeSidebarMobile();
+        if (sidebarOverlay) sidebarOverlay.classList.remove('active');
 
         dashboardScreen.classList.remove('active');
         loginScreen.classList.add('active');

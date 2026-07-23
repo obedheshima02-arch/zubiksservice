@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-    <meta name="description" content="Plateforme professionnelle ZUBIX SERVICE pour la gestion des ristournes, dépôts et retraits en cash.">
+    <meta name="description"
+        content="Plateforme professionnelle ZUBIX SERVICE pour la gestion des ristournes, dépôts et retraits en cash.">
     <title>ZUBIKS SERVICE - Plateforme de Gestion</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -349,12 +350,10 @@
                         </div>
 
                         <div class="panel list-panel glass-panel">
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                                <h3 style="margin: 0;">Répertoire des Membres</h3>
-                                <input type="text" id="search-member-input" class="large-input"
-                                    placeholder="Rechercher un membre..."
-                                    style="width: 250px; margin: 0; padding: 8px;">
+                            <div class="panel-header-responsive mb-20">
+                                <h3>Répertoire des Membres</h3>
+                                <input type="text" id="search-member-input" class="large-input responsive-search-input"
+                                    placeholder="Rechercher un membre...">
                             </div>
                             <div class="table-responsive">
                                 <table id="members-table" class="modern-table">
@@ -447,18 +446,15 @@
                 <!-- Transactions Tab (NEW) -->
                 <div id="tab-transactions" class="tab-pane fade-in">
                     <div class="panel list-panel glass-panel">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                        <div class="panel-header-responsive mb-20">
                             <div>
                                 <h3>Historique Détaillé des Transactions</h3>
-                                <p class="text-muted" style="margin: 0;">Registre chronologique des dépôts et retraits.
-                                </p>
+                                <p class="text-muted" style="margin: 0;">Registre chronologique des dépôts et retraits.</p>
                             </div>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="date" id="filter-transaction-date" class="large-input"
-                                    style="padding: 8px; margin: 0;">
-                                <input type="text" id="search-transaction-input" class="large-input"
-                                    placeholder="Recherche (nom, type)" style="padding: 8px; margin: 0; width: 200px;">
+                            <div class="responsive-filter-group">
+                                <input type="date" id="filter-transaction-date" class="large-input responsive-date-input">
+                                <input type="text" id="search-transaction-input" class="large-input responsive-search-input"
+                                    placeholder="Recherche (nom, type)">
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -620,13 +616,97 @@
                                 </div>
                             </div>
 
-                            <!-- Panel Règlements -->
-                            <div class="panel glass-panel">
-                                <h3>Règlements des Ristournes</h3>
-                                <p class="text-muted mb-20">Consignez ici l'ensemble des règles régissant les
-                                    ristournes, les dépôts et les retraits de fonds pour ZUBIKS SERVICE.</p>
-                                <textarea class="modern-textarea"
-                                    placeholder="Saisissez les règlements intérieurs ici... Les données seront sauvegardées automatiquement."></textarea>
+                            <!-- Panel Règlements d'Ordre Intérieur (Non Modifiable) -->
+                            <div class="panel glass-panel roi-container">
+                                <div class="roi-header">
+                                    <span class="roi-badge">OFFICIEL & NON MODIFIABLE</span>
+                                    <h2>ZUBIKS SERVICES</h2>
+                                    <p class="roi-slogan">VIVRE POUR LES AUTRES</p>
+                                    <p class="roi-subtext">CRÉDIT, GESTION MOBILIÈRE ET IMMOBILIÈRE, SOUS-TRAITANCE, SERVICE TRAITEUR ET PROTOCOLE, ÉPARGNE ET RISTOURNE, ÉDUCATION ET ENCADREMENT DES JEUNES, ENTREPRENEURIAT</p>
+                                    <div class="roi-divider"></div>
+                                    <h3>DÉPARTEMENT : RISTOURNE</h3>
+                                    <h4 class="roi-title">RÈGLEMENT D'ORDRE INTÉRIEUR (R.O.I)</h4>
+                                </div>
+                                
+                                <div class="roi-articles">
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 1</span>
+                                        <p>Notre ristourne regorge toute personne qui possède une activité génératrice de revenu sans distinction de race, tribu ou religion et est dénommée « <strong>RISTOURNE POUR LE RELÈVEMENT ÉCONOMIQUE AIDONS NOUS VIVANTS</strong> » ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 2</span>
+                                        <p>La durée d’un cycle de la ristourne est de 9 semaines soit 63 jours ; elle se paie journalièrement à 1000 FC comme une part et cette dernière est payée selon le niveau de chacun, c.-à-d. même à 100 parts (100 000 FC/jour) ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 3</span>
+                                        <p>Tout membre doit avoir un carnet dans lequel sont enregistrés ses paiements quotidiennes et approuvés par une signature de l’agent recouvreur (AR) ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 4</span>
+                                        <p>Tout membre est tenu au strict respect de vérifier si son argent a été bel et bien enregistré dans son carnet car la signature égale l’argent et sans elle donc pas d’argent car dit-on la confiance n’exclut pas le contrôle ; en cas d’une anomalie constatée ou pour toute autre information relative avec le service, le membre est tenu à contacter le responsable avant 24 heures ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 5</span>
+                                        <p>Pour raison de sécurité pour tous, le recouvrement est fait à partir de 16 heures jusqu’à 18 heures sauf en cas d’un désagrément, mais aussi le membre doit préparer son carnet et l’argent pour ne pas perdre le temps ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 6</span>
+                                        <p>Nous libérons l’argent après une semaine, chaque lundi et/ou mardi, c.-à-d. le retrait est hebdomadaire ; c’est ainsi le membre doit patienter ces deux jours car il n’y a pas une urgence urgente dit-on ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 7</span>
+                                        <p>Le retrait doit se faire pendant les heures de travail allant de 8h00 jusqu’à 16h00. Contrairement à ces heures, l’argent ne sera pas libéré ; outre, le membre doit se munir de son carnet lors du retrait pour référence car personne ne recevra ou retirera pas sans le carnet ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 8</span>
+                                        <p>Le mouvement ou le comment est fait le retrait se fait soit par tirage soit par non tirage, cela dépend des circonstances et faisabilités. Si pas par tirage, le retrait est conditionné par le comment le membre paie (ponctualité) et la demande du membre ; le nouveau membre retire dans la dernière semaine de la fin du cycle et surtout tout membre qui a mal terminé le précédent cycle sera aussi comme un nouveau membre ; si le membre ne paie pas normalement, il retirera le montant compatible avec là où est son mouvement ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 9</span>
+                                        <p>Tout membre qui n’a pas bien terminé le cycle précédent doit laisser cette somme sur son argent comme gage ; s’il termine sans faille, on lui remet son argent. Sinon, cette somme servira pour terminer son cycle, et se fait comme suit : 62-60, 124-120, 186-180, 248-240, 310-300, 372-360, 434-420, 620-6000 ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 10</span>
+                                        <p>Le membre qui échoue le projet ou son cycle doit patienter la fin de ce dernier pour retirer et il paiera une amende, pour ne pas terminer le cycle, de : 1 part à 2 parts = 5000 FC ; 3 aux 6 parts = 10000 FC ; 7 aux 10 parts = 15000 FC ; 11 aux 20 parts = 20000 FC ; 21 aux 50 parts = 35000 FC ; 50 au-delà = 50000 FC. Nb : l’amende est payée si et seulement si le membre dépasse 1 jour de fin de cycle ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 11</span>
+                                        <p>Il est interdit à tout membre de lancer la demande du retrait avant que le cycle ne commence ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 12</span>
+                                        <p>Les membres actifs du présent cycle doivent poser leurs signatures sur la liste pour approuver qu’ils aient pris connaissance de ce ROI et doivent appliquer ce dernier ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 13</span>
+                                        <p>Le membre ne doit faire le dépôt sans signature de l’AR et surtout que ce dernier ne doit pas prendre l’argent sans poser sa signature ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 14</span>
+                                        <p>Pour le retrait, tout membre doit annoncer une semaine avant pour bien étudier son cas, car toute réponse dépendra du mouvement de dépôt de membre et surtout des nombres de demandes… ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 15</span>
+                                        <p>Le cycle se termine à 9 semaines pour tout le monde ; si le membre n’a pas terminé, soit il a une dette, ce dernier ne peut pas continuer à payer ce présent cycle dans le suivant dans l’angle où il veut faire deux cycles en un seul ; si tel est le cas, il paiera les frais de fonctionnement du service qui est la somme recouvrée le tout premier jour du cycle ; toutefois, il peut laisser son argent pour le retirer une fois pour toute après un, deux ou plusieurs cycles et cela sans intérêt ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 16</span>
+                                        <p>L’agent recouvreur prendra chaque dimanche ou lundi les carnets de tous les membres afin d’une évaluation hebdomadaire ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 17</span>
+                                        <p>À chaque début d’une phase ou cycle de la ristourne, chaque membre inscrit doit approuver son enregistrement ou confirmer en signant à ce ROI ;</p>
+                                    </div>
+                                    <div class="roi-article-card">
+                                        <span class="article-num">Art. 18</span>
+                                        <p>Pour le social, tout membre devra payer hebdomadairement 500 FC afin d’assister aux événements heureux et malheureux à nos membres.</p>
+                                    </div>
+                                </div>
+
+                                <div class="roi-footer">
+                                    <p>POUR LE DÉPARTEMENT</p>
+                                    <strong>CHEF DU DÉPARTEMENT</strong>
+                                </div>
                             </div>
                         </div>
 
