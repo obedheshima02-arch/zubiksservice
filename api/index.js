@@ -31,7 +31,7 @@ const DEFAULT_STATE = {
   dailyArchives: [],
   transactions: [],
   credentials: {
-    email: "zubiksservice@gmail.com",
+    email: "Obedtechn02@gmail.com",
     passwordHash: bcrypt.hashSync("Zubiks@2000", 10)
   }
 };
@@ -120,7 +120,7 @@ app.post('/api/auth/login', (req, res) => {
   const lowerEmail = email.trim().toLowerCase();
 
   // Check Admin credentials
-  const adminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : "zubiksservice@gmail.com";
+  const adminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : "Obedtechn02@gmail.com";
   let isAdminMatch = false;
 
   if (lowerEmail === adminEmail) {
@@ -191,7 +191,7 @@ app.post('/api/auth/register', (req, res) => {
   const lowerEmail = email.trim().toLowerCase();
 
   const existing = state.members.find(m => (m.email || '').toLowerCase() === lowerEmail);
-  const adminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : "zubiksservice@gmail.com";
+  const adminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : "Obedtechn02@gmail.com";
 
   if (existing || lowerEmail === adminEmail) {
     return res.status(400).json({ error: "Cette adresse email est déjà enregistrée." });

@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dailyArchives: [], // Historique des journées
         transactions: [], // Historique des transactions
         credentials: {
-            email: 'zubiksservice@gmail.com',
+            email: 'Obedtechn02@gmail.com',
             password: 'Zubiks@2000'
         }
     };
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     state.transactions = parsed.transactions || [];
                     state.argentDebut = parsed.argentDebut !== undefined ? parsed.argentDebut : 0;
                     state.credentials = parsed.credentials || {
-                        email: 'zubiksservice@gmail.com',
+                        email: 'Obedtechn02@gmail.com',
                         password: 'Zubiks@2000'
                     };
 
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             state.transactions = parsed.transactions || [];
             state.argentDebut = parsed.argentDebut !== undefined ? parsed.argentDebut : 0;
             state.credentials = parsed.credentials || {
-                email: 'zubiksservice@gmail.com',
+                email: 'Obedtechn02@gmail.com',
                 password: 'Zubiks@2000'
             };
 
@@ -367,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(`Connexion réussie (${currentUser.role === 'admin' ? 'Administrateur' : currentUser.nom})`, 'success');
         } catch (err) {
             console.error("Erreur de connexion serveur, fallback local :", err);
-            const targetAdminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : 'zubiksservice@gmail.com';
+            const targetAdminEmail = (state.credentials && state.credentials.email) ? state.credentials.email.toLowerCase() : 'Obedtechn02@gmail.com';
             const targetAdminPassword = (state.credentials && state.credentials.password) ? state.credentials.password : 'Zubiks@2000';
 
             if (email === targetAdminEmail && password === targetAdminPassword) {
@@ -670,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td>
                             <input type="number" id="pending-parts-${m.id}" min="1" value="1" style="width: 80px; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; text-align: center; font-weight: bold;">
                         </td>
-                        <td style="display: flex; gap: 6px;">
+                        <td class="action-buttons-cell">
                             <button class="btn-action btn-success" onclick="window.validateMemberParts('${m.id}')" style="background-color: var(--success); display: flex; align-items: center; gap: 4px;">
                                 ✅ Valider
                             </button>
@@ -702,7 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td><a href="#" style="color: var(--primary); text-decoration: none; font-weight: 600;" onclick="window.openMemberDetails('${member.id}'); return false;">${member.nom}</a></td>
                     <td>${member.parts}</td>
                     <td class="text-muted">${formatDate(member.dateAjout)}</td>
-                    <td style="display: flex; gap: 8px;">
+                    <td class="action-buttons-cell">
                         <button class="btn-action" onclick="window.openEditMemberModal('${member.id}')" style="background-color: #3182ce; color: white; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(49, 130, 206, 0.3);" title="Modifier les informations">
                             ✏️ Modifier
                         </button>
@@ -1213,7 +1213,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             state = importedState;
                             if (!state.credentials) {
                                 state.credentials = {
-                                    email: 'zubiksservice@gmail.com',
+                                    email: 'Obedtechn02@gmail.com',
                                     password: 'Zubiks@2000'
                                 };
                             }
@@ -1320,7 +1320,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Reset to empty state template while keeping rules and credentials
                     const currentReglements = state.reglements || "";
                     const currentCredentials = state.credentials || {
-                        email: 'zubiksservice@gmail.com',
+                        email: 'Obedtechn02@gmail.com',
                         password: 'Zubiks@2000'
                     };
                     state = {
@@ -1443,7 +1443,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentUser = {
                         role: 'admin',
                         nom: 'Admin ZUBIKS',
-                        email: (state.credentials && state.credentials.email) ? state.credentials.email : 'zubiksservice@gmail.com'
+                        email: (state.credentials && state.credentials.email) ? state.credentials.email : 'Obedtechn02@gmail.com'
                     };
                 } else if (sess.id || sess.email) {
                     const userMatch = state.members.find(m => String(m.id) === String(sess.id) || (m.email && m.email.toLowerCase() === (sess.email || '').toLowerCase()));

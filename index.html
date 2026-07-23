@@ -49,7 +49,7 @@
                     <form id="login-form">
                         <div class="input-group">
                             <label for="email">Adresse Email</label>
-                            <input type="email" id="email" placeholder="zubiksservice@gmail.com ou votre email"
+                            <input type="email" id="email" placeholder="Obedtechn02@gmail.com ou votre email"
                                 required>
                         </div>
                         <div class="input-group">
@@ -67,11 +67,11 @@
                     <form id="register-form">
                         <div class="input-group">
                             <label for="reg-nom">Nom</label>
-                            <input type="text" id="reg-nom" placeholder="Ex: KABANGE" required>
+                            <input type="text" id="reg-nom" placeholder="Ex: Obed" required>
                         </div>
                         <div class="input-group">
                             <label for="reg-postnom">Post-Nom</label>
-                            <input type="text" id="reg-postnom" placeholder="Ex: MUKENDI" required>
+                            <input type="text" id="reg-postnom" placeholder="Ex: Heshima" required>
                         </div>
                         <div class="input-group">
                             <label for="reg-sexe">Sexe</label>
@@ -84,7 +84,7 @@
                         </div>
                         <div class="input-group">
                             <label for="reg-email">Adresse email</label>
-                            <input type="email" id="reg-email" placeholder="exemple@gmail.com" required>
+                            <input type="email" id="reg-email" placeholder="Obedtechn02@gmail.com" required>
                         </div>
                         <div class="input-group">
                             <label for="reg-password">Mot de passe</label>
@@ -308,10 +308,12 @@
                     <!-- Section Inscriptions en Attente de Validation -->
                     <div id="pending-members-panel" class="panel glass-panel mb-20"
                         style="display: none; border-left: 4px solid var(--warning); background: #fffaf0;">
-                        <h3 style="color: #c05621; border-bottom-color: #feebc8;">⚠️ Inscriptions d'utilisateurs en
-                            attente de validation</h3>
-                        <p class="text-muted mb-20">Consultez les demandes créées par les utilisateurs et définissez
-                            leur nombre de parts pour valider leur compte.</p>
+                        <div class="panel-header-responsive mb-20">
+                            <div>
+                                <h3 style="color: #c05621; border-bottom: none; margin: 0; padding: 0;">⚠️ Inscriptions d'utilisateurs en attente</h3>
+                                <p class="text-muted" style="margin: 4px 0 0 0; font-size: 0.85rem;">Consultez les demandes créées par les utilisateurs et définissez leur nombre de parts pour valider leur compte.</p>
+                            </div>
+                        </div>
                         <div class="table-responsive">
                             <table id="pending-members-table" class="modern-table">
                                 <thead>
@@ -333,25 +335,30 @@
 
                     <div class="layout-grid">
                         <div class="panel form-panel glass-panel">
-                            <h3>Ajouter un nouveau membre</h3>
+                            <div class="panel-header" style="margin-bottom: 15px; border-bottom: 2px solid #edf2f7; padding-bottom: 10px;">
+                                <h3 style="margin: 0; border: none;">Ajouter un membre</h3>
+                            </div>
                             <form id="add-member-form">
                                 <div class="form-group">
                                     <label for="nom-id">Nom & Post-Nom</label>
-                                    <input type="text" id="nom-id" required placeholder="Ex: Jean Dupont">
+                                    <input type="text" id="nom-id" required placeholder="Ex: Obed Heshima">
                                 </div>
                                 <div class="form-group">
                                     <label for="parts">Nombre de Parts</label>
                                     <input type="number" id="parts" min="1" required placeholder="1">
                                 </div>
-                                <div class="form-actions">
-                                    <button type="submit" class="btn-success">Enregistrer le membre</button>
+                                <div class="form-actions mt-20">
+                                    <button type="submit" class="btn-success w-100" style="padding: 12px; font-size: 1rem; font-weight: 600;">+ Enregistrer le membre</button>
                                 </div>
                             </form>
                         </div>
 
                         <div class="panel list-panel glass-panel">
                             <div class="panel-header-responsive mb-20">
-                                <h3>Répertoire des Membres</h3>
+                                <div>
+                                    <h3 style="margin: 0; border: none;">Répertoire des Membres</h3>
+                                    <p class="text-muted" style="margin: 4px 0 0 0; font-size: 0.85rem;">Consultez et gérez la liste de vos membres inscrits.</p>
+                                </div>
                                 <input type="text" id="search-member-input" class="large-input responsive-search-input"
                                     placeholder="Rechercher un membre...">
                             </div>
@@ -721,7 +728,7 @@
                                     <div class="form-group" style="margin-bottom: 15px;">
                                         <label for="change-email">Nouvel Email ID Admin</label>
                                         <input type="email" id="change-email" required
-                                            placeholder="Ex: zubiksservice@gmail.com" class="large-input">
+                                            placeholder="Ex: Obedtechn02@gmail.com" class="large-input">
                                     </div>
                                     <div class="form-group" style="margin-bottom: 20px;">
                                         <label for="change-password">Nouveau mot de passe</label>
@@ -810,7 +817,7 @@
                 <input type="hidden" id="edit-member-id">
                 <div class="form-group mt-20">
                     <label for="edit-nom-id">Nom ID</label>
-                    <input type="text" id="edit-nom-id" class="large-input" required>
+                    <input type="text" id="edit-nom-id" class="large-input" required placeholder="Ex: Obed Heshima">
                 </div>
                 <div class="form-group mt-20">
                     <label for="edit-parts">Nombre de Parts</label>
@@ -834,7 +841,7 @@
             <div class="modal-body">
                 <h3 id="details-nom-id"
                     style="text-align: center; color: var(--primary); margin-bottom: 20px; font-size: 1.5rem;">...</h3>
-                <div class="stats-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="stats-grid member-details-grid">
                     <div class="stat-card"
                         style="padding: 15px; text-align: center; background: #f8fafc; border: 1px solid #e2e8f0;">
                         <h4 style="color: #718096; font-size: 0.9rem; margin-bottom: 5px;">Nombre de Parts</h4>

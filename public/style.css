@@ -1230,3 +1230,34 @@ button {
         gap: 8px;
     }
 }
+
+/* --- Action Buttons & Member Details Grid Responsiveness --- */
+.action-buttons-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.member-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+@media (max-width: 540px) {
+    .member-details-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .action-buttons-cell {
+        gap: 4px;
+    }
+
+    .action-buttons-cell .btn-action {
+        padding: 5px 8px;
+        font-size: 0.76rem;
+        white-space: nowrap;
+    }
+}
