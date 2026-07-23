@@ -609,6 +609,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 pageTitle.textContent = tabTitles[targetId];
             }
 
+            if (targetId === 'tab-admin-chat') renderAdminChat();
+            if (targetId === 'tab-user-chat') renderUserChat();
+
             // Fermer le tiroir mobile après sélection
             closeSidebarMobile();
         });
@@ -935,11 +938,29 @@ document.addEventListener('DOMContentLoaded', () => {
                         `;
                         userNotifList.appendChild(div);
                     });
+            if (userNotifList) {
+                userNotifList.innerHTML = '';
+                if (notifs.length > 0) {
+                    [...notifs].reverse().forEach(n => {
+                        const div = document.createElement('div');
+                        div.className = 'glass-inner';
+                        div.style.borderLeft = n.read ? '4px solid #cbd5e0' : '4px solid var(--accent-color)';
+                        div.style.background = n.read ? '#f8fafc' : '#f0fdf4';
+                        div.style.padding = '15px';
+                        div.style.borderRadius = 'var(--radius-sm)';
+                        div.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
+                                <strong style="color: var(--primary-dark); font-size: 0.95rem;">${n.read ? '🔔 Notification' : '🟢 Nouvelle Notification'}</strong>
+                                <small class="text-muted">${new Date(n.date).toLocaleString('fr-FR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})}</small>
+                            </div>
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--text-main);">${n.message}</p>
+                        `;
+                        userNotifList.appendChild(div);
+                    });
                 } else {
                     userNotifList.innerHTML = '<div class="text-center text-muted" style="padding: 20px;">Aucune notification reçue pour le moment.</div>';
                 }
             }
-        }
 
             // User 63-Day Cycle Calculations (Requirement 2)
             const userParts = Number(currentUser.parts) || 0;
